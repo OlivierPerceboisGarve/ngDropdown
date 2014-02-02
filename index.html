@@ -3,43 +3,41 @@
 
   <head>
     <link rel="stylesheet" href="style.css">
-  <script src="/googleapis/ajax/libs/angularjs/1.2.10/angular.js"></script>
-  <script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-resource.js"></script>
-  <script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-sanitize.js"></script>
-  <script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-mocks.js"></script>
-  <script src="ui-keypress.js"></script>
-  <script src="script.js"></script> 
-  </head>
-
-
-  <body ng-controller="food">
-  <br /><input type="text"><br />dropdown static<br />
-		<!--dropdown name="foo" ng-model="foo">
-		<ul>
+	<script src="/googleapis/ajax/libs/angularjs/1.2.10/angular.js"></script>
+	<script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-resource.js"></script>
+	<script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-sanitize.js"></script>
+	<script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-mocks.js"></script>
+	<script src="ui-keypress.js"></script>
+	<script src="script.js"></script> 
+</head>
+	<body ng-controller="food">
+		<input type="text">
+		<br />dropdown static<br />
+		<dropdown name="foo" ng-model="foo">
 			<ddli value="1"><span class='bla'>abc</span><span class='bli'>def</span></ddli>
 			<ddli value="2">xyz</ddli>
 			<ddli value="3">foo</ddli>
 			<ddli value="4">bar</ddli>
-		</ul>
-		</dropdown-->
-<br /><br />dropdown ng-repeat<br />
+		</dropdown>
+		<br />dropdown static with default<br />
+		<dropdown name="fu" ng-model="fu">
+			<ddli value="1"><span class='bla'>hu</span><span class='bli'>da</span></ddli>
+			<ddli value="2">ding</ddli>
+			<ddli value="3" default="true">dong</ddli>
+			<ddli value="4">lala</ddli>
+		</dropdown>
+		<br />
+		with ng-repeat with default
+		<br />
 		<dropdown name="foobar" ng-model="foobar">
-			<ul>
-				<ddli value="{{vegie.id}}" ng-repeat="vegie in vegies" default="{{vegie.name === 'carots'}}">{{vegie.name}}</ddli>
-			</ul>
+			<ddli value="{{vegie.id}}" ng-repeat="vegie in vegies" default="{{vegie.name === 'carots'}}">{{vegie.name}}</ddli>
 		</dropdown>
-		<br /><br />
-		<br /><br />
+		<br />
+		with ng-repeat without default
+		<br />
 		<dropdown name="foobarbaz" ng-model="foobarbaz">
-			<ul>
-				<ddli value="{{fish.id}}" ng-repeat="fish in fishes" default="{{fish.name === 'turbott'}}">{{fish.name}}</ddli>
-			</ul>
+			<ddli value="{{fish.id}}" ng-repeat="fish in fishes">{{fish.name}}</ddli>
 		</dropdown>
-		<!--div value="{{vegie.id}}" ng-repeat="vegie in vegies" ng-default="{{vegie.name === 'carots'}}">
-			<span class='bla'>{{vegie.name}}</span>
-			<span class='bli'>bla</span>
-		</div-->	
-		<div ng-attr="{checked: 1}">ng-attr</div> 	
-  </body>
+	</body>
 
 </html>
