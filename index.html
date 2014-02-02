@@ -3,37 +3,42 @@
 
   <head>
     <link rel="stylesheet" href="style.css">
-    <script src="/googleapis/ajax/libs/angularjs/1.2.3/angular.js"></script>
-  <script src="/googleapis/ajax/libs/angularjs/1.2.3/angular-resource.js"></script>
-  <script src="/googleapis/ajax/libs/angularjs/1.2.3/angular-sanitize.js"></script>
-  <script src="/googleapis/ajax/libs/angularjs/1.2.3/angular-mocks.js"></script>
+  <script src="/googleapis/ajax/libs/angularjs/1.2.10/angular.js"></script>
+  <script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-resource.js"></script>
+  <script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-sanitize.js"></script>
+  <script src="/googleapis/ajax/libs/angularjs/1.2.10/angular-mocks.js"></script>
   <script src="ui-keypress.js"></script>
   <script src="script.js"></script> 
   </head>
 
 
-  <body ng-controller="vegies">
+  <body ng-controller="food">
   <br /><input type="text"><br />dropdown static<br />
-		<dropdown name="foobarbaz">
+		<!--dropdown name="foo" ng-model="foo">
 		<ul>
 			<ddli value="1"><span class='bla'>abc</span><span class='bli'>def</span></ddli>
 			<ddli value="2">xyz</ddli>
 			<ddli value="3">foo</ddli>
 			<ddli value="4">bar</ddli>
 		</ul>
-		</dropdown>
+		</dropdown-->
 <br /><br />dropdown ng-repeat<br />
-		<dropdown name="foobar">
-		<ul>
-			<ddli value="{{vegie.id}}" ng-repeat="vegie in vegies" default="{{vegie.name === 'carots'}}">{{vegie.name}}</ddli>
-		</ul>
+		<dropdown name="foobar" ng-model="foobar">
+			<ul>
+				<ddli value="{{vegie.id}}" ng-repeat="vegie in vegies" default="{{vegie.name === 'carots'}}">{{vegie.name}}</ddli>
+			</ul>
 		</dropdown>
 		<br /><br />
 		<br /><br />
-		<div value="{{vegie.id}}" ng-repeat="vegie in vegies" ng-default="{{vegie.name === 'carots'}}">
+		<dropdown name="foobarbaz" ng-model="foobarbaz">
+			<ul>
+				<ddli value="{{fish.id}}" ng-repeat="fish in fishes" default="{{fish.name === 'turbott'}}">{{fish.name}}</ddli>
+			</ul>
+		</dropdown>
+		<!--div value="{{vegie.id}}" ng-repeat="vegie in vegies" ng-default="{{vegie.name === 'carots'}}">
 			<span class='bla'>{{vegie.name}}</span>
 			<span class='bli'>bla</span>
-		</div>	
+		</div-->	
 		<div ng-attr="{checked: 1}">ng-attr</div> 	
   </body>
 
