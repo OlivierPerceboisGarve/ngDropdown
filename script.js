@@ -36,21 +36,24 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				show : false
 			};
 
-			this.defaultIsSet = false;
 			$scope.firstOptionSelected = false;
-			//var options = 
 			this.options = [];
-			var indexDefault = $scope.indexDefault = 0;
+			//var indexDefault = $scope.indexDefault = 0;
 			this.addOption = function (option) {
 				return this.options.push(option[0]);
 			};
 
-			this.select = function select(el, isDefault) {
+
+			this.preselect = function select(el, isDefault) {
 				if (!$scope.firstOptionSelected || isDefault){
 					$scope.firstOptionSelected = true;
-					$scope.dropdown.selection = $sce.trustAsHtml(el.html());
-					$scope.dropdown.value = el.attr('value');
+					this.select(el);
 				}
+			};
+
+			this.select = function select(el) {
+				$scope.dropdown.selection = $sce.trustAsHtml(el.html());
+				$scope.dropdown.value = el.attr('value');
 			};
 
 			$scope.tab = $scope.up = function(){
@@ -62,6 +65,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				$event.stopPropagation();
 				$scope.dropdown.show = true;
 				$timeout(function(){
+					//equivalent to jQuery('li.option')[0].focus(); //yep, verbose.
 					var lis = $element.find('li');
 					var focused = false;
 					for (var i = 0, len = lis.length; i < len; i++){
@@ -77,7 +81,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 
 		compile: function compile(el, attr){
 			return {
-				pre: function($scope, el, attr, ngModel) {
+				link: function($scope, el, attr, ngModel) {
 					$scope.$watch('dropdown.value',function (newVal) {	
 						ngModel.$setViewValue(newVal);
 					});
@@ -96,76 +100,65 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		template: '<li class="option" tabindex="0" ng-click="selectEl()" ui-keypress="{\'up\': \'up($event);\', \'down\': \'down($event);\'}" ></li>',//
 		transclude: true,
 		replace: true,
-		//priority: 90,
 		scope: true,
 		compile: function(el, attrs){
 			return function(scope, el, attrs, controller,  $transclude) {
-				  $transclude(scope, function(nodes) {
-				    el.append(nodes);
-				  }); 
-				console.log('ddli compile attrs', attrs);
+				$transclude(scope, function(nodes) {
+					el.append(nodes);
+				}); 
+
+				var dropdownCtrl = controller;
+
 				var interpolateTextFn = $interpolate(el.text(), true);
 				var interpolateDefaultFn = $interpolate(attrs, true);
 				var state = {text: el.text(), default: attrs.default}; 
-				var dropdown = controller;
-				var rank = dropdown.addOption(el);
-				console.log('ddli dropdown options', dropdown.options);
+				
+				var rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
+
 			    if (interpolateTextFn){
-			      	console.info('ddli WATCH');
 			        scope.$watch(update, render,true);
 			    } else {
-			      	console.log('ddli compile no interpolateFn go render');
 			      	render(state);
 			    }
 			      
 			    function update() {
-			        console.log('ddli update');
 			        if (interpolateTextFn) {
-			        	console.log('ddli compile update if interpolateFn');
 			        	state.text = interpolateTextFn(scope);
 			        	//state.default = interpolateDefaultFn(scope);
 			    	}
 			    	return state;
 			    }
 			    function render(value) {
-			    	console.log('ddli compile render', value.text);
 			    	el.text(value.text);
-			    	console.warn('ddli compile value.default', typeof value.default, value.default);
-			    	dropdown.select(el);
-			    	if (value.default === 'true'){
-			    		console.info('ddli select default !!!');
-			    		dropdown.select(el, true);
-			    		//dropdown.setDefault(rank);
-			    		//dropdown.
-			    	}
-			    	
+			    	dropdownCtrl.preselect(el);
+			    	if (angular.isDefined(value.default) && value.default !== 'false'){
+			    		dropdownCtrl.preselect(el, true);
+			    	}			    	
 			    }
 	      
 				scope.selectEl = function() {
-					dropdown.select(el);
+					dropdownCtrl.select(el);
 				};
 
 
 				scope.up = function($event){
 					$event.preventDefault();
 					$event.stopPropagation();
-					if (angular.isDefined(dropdown.options[rank-2])){
-						dropdown.options[rank-2].focus();
+					if (angular.isDefined(dropdownCtrl.options[rank-2])){
+						dropdownCtrl.options[rank-2].focus();
 					} else {
-						var len = dropdown.options.length;
-						dropdown.options[len-1].focus();
+						var len = dropdownCtrl.options.length;
+						dropdownCtrl.options[len-1].focus();
 					}
 				};
 
 				scope.down = function($event){
-					console.info('down', rank);
-					console.info('down', dropdown.options[rank]);
 					$event.preventDefault();
 					$event.stopPropagation();
-					if (angular.isDefined(dropdown.options[rank])){
-						dropdown.options[rank].focus();
+					if (angular.isDefined(dropdownCtrl.options[rank])){
+						dropdownCtrl.options[rank].focus();
 					} else {
-						dropdown.options[0].focus();
+						dropdownCtrl.options[0].focus();
 					}
 				};
 			}
