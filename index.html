@@ -30,7 +30,7 @@
 		with ng-repeat with default
 		<br />
 		<dropdown name="foobar" ng-model="foobar">
-			<ddli value="{{vegie.id}}" ng-repeat="vegie in vegies" default="{{vegie.name === 'carots'}}">{{vegie.name}}</ddli>
+			<ddli value="{{vegie.id}}" ng-repeat="(i, vegie) in vegies" default="{{vegie.name === 'carots'}}" selected="{{i}}">{{vegie.name}}</ddli>
 		</dropdown>
 		<br />
 		with ng-repeat without default
