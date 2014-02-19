@@ -46,6 +46,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 
 			this.options = [];
 			this.hasFocus = false;
+			this.$element = $element.find('div');
 			//var indexDefault = $scope.indexDefault = 0;
 			//$scope.inputname = $element.attr('name');
 			//console.log('$element', $element.attr('name'));
@@ -56,8 +57,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			//$element.append($compile(tpl)($scope));
 			var doc = angular.element(document);
 			console.log('doc : ', doc);
-			window.onclick = function foo(){
-				console.log(this);
+			window.onclick = function foo(e){
+				console.log(e, this);
 			};
 
 
@@ -66,6 +67,9 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 
 
 			//}
+			$element[0].onblur = function(){
+				console.log('DD blur', document.activeElenent, arguments);
+			}
 			
 
 			this.addOption = function (option) {
@@ -83,6 +87,11 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			this.select = function select(el) {
 				$scope.dropdown.selection = $sce.trustAsHtml(el.html());
 				$scope.dropdown.value = el.attr('value');
+				$timeout(function(){
+					console.log('select', $element.find('div')[0]);
+					$scope.dropdown.show = false;
+					$element.find('div')[0].focus();
+				}, 0);
 			};
 
 			$scope.tab = $scope.up = function(){
@@ -102,6 +111,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 						if (angular.element(lis[0]).hasClass('option')){
 							lis[0].focus();
 							focused = true;
+							console.log('DD ddli refocus', document.activeElenent);
 						}	
 					}
 				},
@@ -126,11 +136,11 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 	};
 	return DDO;
 }])
-.directive('ddli',[ '$interpolate', function($interpolate) {
+.directive('ddli',[ '$interpolate', '$timeout', function($interpolate,  $timeout) {
 	var DDO = {
 		restrict: 'E',
 		require: '^dropdown',
-		template: '<li class="option" tabindex="0" ng-click="selectEl()" ui-keypress="{\'shift-tab\': \'tab();\', \'tab\': \'tab();\', \'up\': \'up($event);\', \'down\': \'down($event);\'}" ></li>',//
+		template: '<li class="option" tabindex="0" ng-click="selectEl()" ui-keypress="{\'shift-tab\': \'tab();\', \'enter\': \'selectEl();\',\'tab\': \'tab();\', \'up\': \'up($event);\', \'down\': \'down($event);\'}" ></li>',//
 		transclude: true,
 		replace: true,
 		scope: true,
@@ -147,10 +157,10 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				var state = {text: el.text(), default: attrs.default}; 
 				
 				var rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
-				console.log('ddli');
+				console.log('ddli', dropdownCtrl);
 
-				el[0].onfocus = function(){
-					//console.log('focus', arguments);
+				el[0].onblur = function(){
+					console.log('ddli blur', document.activeElenent, arguments);
 				}
 		    	
 
@@ -160,6 +170,9 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 					}else{
 						console.log('other');
 						this.focus();
+						//$timeout(function(){
+						//	console.log('ddli onmousemove refocus', document.activeElenent);
+						//},100);
 					}
 				}
 
@@ -189,6 +202,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 	      
 				scope.selectEl = function() {
 					dropdownCtrl.select(el);
+					//dropdownCtrl.$element[0].focus();
+
 				};
 
 
@@ -202,6 +217,10 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 						var len = dropdownCtrl.options.length;
 						dropdownCtrl.options[len-1].focus();
 					}
+					$timeout(function(){
+					//console.log('ddli up refocus has Focus', dropdownCtrl.options[rank], '- 2 : ', dropdownCtrl.options[rank-1].hasFocus , '- 3 : ', dropdownCtrl.options[rank-2].hasFocus  );
+					console.log('doc', document.activeElenent);
+					}, 0);
 				};
 
 				scope.down = function($event){
@@ -210,6 +229,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 					$event.stopPropagation();
 					if (angular.isDefined(dropdownCtrl.options[rank])){
 						dropdownCtrl.options[rank].focus();
+						console.log('ddli down refocus', document.activeElenent);
 					} else {
 						dropdownCtrl.options[0].focus();
 					}
