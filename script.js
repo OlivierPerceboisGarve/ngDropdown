@@ -29,7 +29,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		},
 		transclude: true,
 		scope: true,
-		//priority: 100,
+		priority: 100,
 		controller: ['$scope', '$element', '$timeout',
 			function( $scope,   $element,   $timeout) {
 
@@ -55,8 +55,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 
 			//console.log($compile(tpl)($scope));
 			//$element.append($compile(tpl)($scope));
-			var doc = angular.element(document);
-			console.log('doc : ', doc);
+			//var doc = angular.element(document);
+			//console.log('doc : ', doc);
 			window.onclick = function foo(e){
 				console.log(e, this);
 			};
@@ -87,6 +87,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			this.select = function select(el) {
 				$scope.dropdown.selection = $sce.trustAsHtml(el.html());
 				$scope.dropdown.value = el.attr('value');
+				console.log('newval shoud be', $scope.dropdown.value);
 				$timeout(function(){
 					console.log('select', $element.find('div')[0]);
 					$scope.dropdown.show = false;
@@ -120,15 +121,11 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		}],
 
 		compile: function compile(el, attr){
-			/*$transclude(scope, function(nodes) {
-				el.append(nodes);
-			});*/ 
-			return {
-				link: function($scope, el, attr, ngModel) {
-					$scope.$watch('dropdown.value',function (newVal) {	
-						ngModel.$setViewValue(newVal);
-					});
-				}				
+			return function($scope, el, attr, ngModel) {
+				$scope.$watch('dropdown.value',function (newVal, oldVal) {	
+					ngModel.$setViewValue(newVal);
+				});
+								
 			}
 
 		}
@@ -157,7 +154,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				var state = {text: el.text(), default: attrs.default}; 
 				
 				var rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
-				console.log('ddli', dropdownCtrl);
+				//onsole.log('ddli', dropdownCtrl);
 
 				el[0].onblur = function(){
 					console.log('ddli blur', document.activeElenent, arguments);

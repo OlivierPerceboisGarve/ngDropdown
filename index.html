@@ -12,14 +12,14 @@
 </head>
 	<body ng-controller="food">
 		<input type="text">
-		<br />dropdown static<br />
+		<br />dropdown static {{foo}}<br />
 		<dropdown name="foo" ng-model="foo">
 			<ddli value="1"><span class='bla'>abc</span><span class='bli'>def</span></ddli>
 			<ddli value="2">xyz</ddli>
 			<ddli value="3">foo</ddli>
 			<ddli value="4">bar</ddli>
 		</dropdown>
-		<br />dropdown static with default attr without value<br />
+		<br />dropdown static with default attr without value {{fu}}<br />
 		<dropdown name="fu" ng-model="fu">
 			<ddli value="1"><span class='bla'>hu</span><span class='bli'>da</span></ddli>
 			<ddli value="2">ding</ddli>
@@ -27,13 +27,13 @@
 			<ddli value="4">lala</ddli>
 		</dropdown>
 		<br />
-		with ng-repeat with default
+		with ng-repeat with default  {{foobar}}
 		<br />
 		<dropdown name="foobar" ng-model="foobar">
 			<ddli value="{{vegie.id}}" ng-repeat="(i, vegie) in vegies" default="{{vegie.name === 'carots'}}" selected="{{i}}">{{vegie.name}}</ddli>
 		</dropdown>
 		<br />
-		with ng-repeat without default
+		with ng-repeat without default {{foobarbaz}}
 		<br />
 		<dropdown name="foobarbaz" ng-model="foobarbaz">
 			<ddli value="{{fish.id}}" ng-repeat="fish in fishes">{{fish.name}}</ddli>
