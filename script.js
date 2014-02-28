@@ -21,7 +21,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 	$scope.foo = 3;
 })
 .directive("dropdown", ['$sce' , '$compile',
-				function($sce, $compile) {
+				function($sce,    $compile) {
 	var DDO = {
 		restrict: 'E',
 		require: '?ngModel',
@@ -45,46 +45,43 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				
 			};
 
-			console.log('DD li len', $element.find('div').find('li').length);
-			console.log('DD ddli len', $element.find('div').find('ddli').length);
+			//console.log('DD li len', $element.find('div').find('li').length);
+			//console.log('DD ddli len', $element.find('div').find('ddli').length);
+			var temp = $element.attr('name');
+
+			console.log('temp', temp);
 
 			var options = this.options = [];
-			this.hasFocus = false;
-			this.$element = $element.find('div');
 
-			window.onclick = function foo(e){
-				console.log(e, this);
-			};
-			ctrl = this;
-			$element[0].onblur = function(){
-				console.log('DD blur el', document.activeElement);//, arguments);
-				ctrl.hasFocus();
-			}
-			
+			ctrl = this;			
 			$element.find('div')[0].onblur = function(){
 				console.log('DD blur div', this.hasFocus, document.activeElement);//, arguments);
 				ctrl.hasFocus();
 			}
 
+			console.info('$scope ', $scope);
+
 			$scope.hasFocus = this.hasFocus = function(){
 				opts = this.options;
+				var show = $scope.dropdown.show;
+				console.info('B4 $scope.dropdown.show before timeout', temp, $scope.dropdown.show, $scope);
 				$timeout(function(){
 					var hasFocus = false;
-					console.log('document.activeElement : ', document.activeElement);
+					//console.log('document.activeElement : ', document.activeElement);
 					opts.forEach(function(el){
-						console.log('options elems :', el);
+						//console.log('options elems :', el);
 						if (el === document.activeElement){
-							console.info('WINNER');
+							console.info('opt WINNER');
 							hasFocus = true;
 						}
 					});
 					if (!hasFocus){
-						console.log('has foc DD', $element[0]);
+						//console.log('has foc DD', $element[0]);
 						if ($element[0] === document.activeElement){
 							hasFocus = true;
 							console.warn('DD WINNER');
 						}
-						console.log('has foc DD div', $element.find('div')[0]);
+						//console.log('has foc DD div', $element.find('div')[0]);
 						if ($element.find('div')[0] === document.activeElement){
 							hasFocus = true;
 							console.warn('div WINNER');
@@ -93,6 +90,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 					}
 					if (!hasFocus){
 						console.log('close it', hasFocus);
+						console.warn('IN $scope.dropdown.show in timeout', temp, $scope.dropdown.show, 'show : ', show, $scope);
+						$scope.dropdown.show = false;
 					}
 				}, 0);
 
@@ -105,7 +104,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			
 
 			this.addOption = function (option) {
-				console.warn('addOption this', this);
+				//console.warn('addOption this', this);
 				return this.options.push(option[0]);
 			};
 
@@ -133,7 +132,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			};
 
 			$scope.select = this.select = function select(el) {
-				console.log('select', el);
+				//console.log('select', el);
 				$scope.dropdown.selection = $sce.trustAsHtml(el.html());
 				$scope.dropdown.value = el.attr('value');
 				$timeout(function(){
@@ -170,9 +169,9 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 
 		compile: function compile(el, attr){
 			
-			console.info('DD compile ngModel.viewValue', this);
+			//console.info('DD compile ngModel.viewValue', this);
 			var foo = el.find('div').find('input').eq(0);
-			console.info('DD compile ', foo, foo.controller('ngModel'));
+			//console.info('DD compile ', foo, foo.controller('ngModel'));
 
 			return { post: function($scope, el, attr, ctrl) {
 				console.info('DD LINK  el.controller("ngModel")', el, el.find('div'), el.find('div').find('ddli').length, el.controller('ngModel'), '- ctrl.$viewValue :', ctrl.$viewValue); //ngModel, $scope.dropdown.value
@@ -195,7 +194,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 	};
 	return DDO;
 }])
-.directive('ddli',[ '$interpolate', '$timeout', function($interpolate,  $timeout) {
+.directive('ddli',[ '$interpolate', '$timeout', 
+		function(    $interpolate,   $timeout) {
 	var DDO = {
 		restrict: 'E',
 		require: '^dropdown',
@@ -212,14 +212,14 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		replace: true,
 		scope: true,
 		compile: function(el, attrs){
-			console.log('ddli compile', el);
+			//console.log('ddli compile', el);
 			return {post: function(scope, el, attrs, dropdownCtrl,  $transclude) {
-				console.log('ddli link', el);
+				//console.log('ddli link', el);
 
-				var i = 0;
+				//var i = 0;
 				$transclude(scope, function(nodes) {
-					i++;
-					console.log('nodes', nodes, i);
+					//i++;
+					//console.log('nodes', nodes, i);
 					el.append(nodes);
 				}); 
 
@@ -244,15 +244,15 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			    }
 			    function render(value) {
 			    	el.text(value.text);
-			    	console.log('ddli render', dropdownCtrl, angular.isDefined(value.default));
+			    	//console.log('ddli render', dropdownCtrl, angular.isDefined(value.default));
 			    	if (angular.isDefined(value.default) && value.default !== 'false'){
-			    		console.log('ddli preselect');
+			    		//console.log('ddli preselect');
 			    		dropdownCtrl.preselect(el, true);
 			    	}			    	
 			    }
 								
 				var rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
-				console.log('rank', rank);
+				//console.log('rank', rank);
 				if (rank === 1){
 					dropdownCtrl.select(el);
 				}
