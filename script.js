@@ -55,34 +55,46 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			window.onclick = function foo(e){
 				console.log(e, this);
 			};
+			ctrl = this;
 			$element[0].onblur = function(){
 				console.log('DD blur el', document.activeElement);//, arguments);
+				ctrl.hasFocus();
 			}
+			
 			$element.find('div')[0].onblur = function(){
 				console.log('DD blur div', this.hasFocus, document.activeElement);//, arguments);
+				ctrl.hasFocus();
 			}
 
-			this.hasFocus = function(){
-				var hasFocus = false;
-				console.log('document.activeElement : ', document.activeElement);
-				this.options.forEach(function(el){
-					console.log('options elems :', el);
-					if (el === document.activeElement){
-						console.info('WINNER');
-						hasFocus = true;
+			$scope.hasFocus = this.hasFocus = function(){
+				opts = this.options;
+				$timeout(function(){
+					var hasFocus = false;
+					console.log('document.activeElement : ', document.activeElement);
+					opts.forEach(function(el){
+						console.log('options elems :', el);
+						if (el === document.activeElement){
+							console.info('WINNER');
+							hasFocus = true;
+						}
+					});
+					if (!hasFocus){
+						console.log('has foc DD', $element[0]);
+						if ($element[0] === document.activeElement){
+							hasFocus = true;
+							console.warn('DD WINNER');
+						}
+						console.log('has foc DD div', $element.find('div')[0]);
+						if ($element.find('div')[0] === document.activeElement){
+							hasFocus = true;
+							console.warn('div WINNER');
+						}
+						//if ($element) 
 					}
-				});
-				if (!hasFocus){
-					console.log('has foc', $element[0]);
-					if ($element[0] === document.activeElement){
-						console.warn('DD WINNER');
+					if (!hasFocus){
+						console.log('close it', hasFocus);
 					}
-					if ($element.find('div')[0] === document.activeElement){
-						console.warn('div WINNER');
-					}
-					//if ($element) 
-				}
-
+				}, 0);
 
 			}
 			//this.reset
@@ -130,7 +142,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				}, 0);
 			};
 
-			$scope.select = this.select;
+			//$scope.select = this.select;
 
 			$scope.tab = $scope.up = function(){
 				console.log('DD tab');
@@ -190,10 +202,10 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		template: 	'<li class="option" tabindex="0" ng-click="selectEl()"'
 						+' ui-keypress="{'
 							+"'shift-tab':	'tab1();', "
-							+"'enter\':		\'selectEl();\', "
-							+"'tab\':			\'tab1();\', "
-							+"'up\':			\'up($event);\', "
-							+"'down\':		\'down($event);\'"
+							+"'enter':		'selectEl();', "
+							+"'tab':		'tab1();', "
+							+"'up':			'up($event);', "
+							+"'down':		'down($event);'"
 						+'}" >'
 					+'</li>',
 		transclude: true,
@@ -201,9 +213,13 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		scope: true,
 		compile: function(el, attrs){
 			console.log('ddli compile', el);
-			return function(scope, el, attrs, dropdownCtrl,  $transclude) {
+			return {post: function(scope, el, attrs, dropdownCtrl,  $transclude) {
 				console.log('ddli link', el);
+
+				var i = 0;
 				$transclude(scope, function(nodes) {
+					i++;
+					console.log('nodes', nodes, i);
 					el.append(nodes);
 				}); 
 
@@ -236,9 +252,14 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			    }
 								
 				var rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
+				console.log('rank', rank);
+				if (rank === 1){
+					dropdownCtrl.select(el);
+				}
 
 				el[0].onblur = function(){
 					console.log('ddli blur');//, dropdownCtrl, document.activeElement, arguments);
+					dropdownCtrl.hasFocus();
 				}
 
 		    	//maintains the focus under the mouse cursor
@@ -267,7 +288,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 						var len = dropdownCtrl.options.length;
 						dropdownCtrl.options[len-1].focus();
 					}
-					dropdownCtrl.hasFocus();
+					
+
 					//$timeout(function(){
 						//dropdownCtrl.hasFocus();
 					//console.log('ddli up refocus has Focus', dropdownCtrl.options[rank], '- 2 : ', dropdownCtrl.options[rank-1].hasFocus , '- 3 : ', dropdownCtrl.options[rank-2].hasFocus  );
@@ -286,7 +308,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 						dropdownCtrl.options[0].focus();
 					}
 				};
-			}
+			}}
 
 		}
 

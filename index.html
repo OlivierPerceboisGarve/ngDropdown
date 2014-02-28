@@ -12,7 +12,7 @@
 </head>
 	<body ng-controller="food">
 		<input type="text">
-		<!--
+
 		<br />dropdown static {{foo}}<br />
 		<dropdown name="foo" ng-model="foo">
 			<ddli value="1">
@@ -40,8 +40,8 @@
 			</ddli>
 		</dropdown>
 		<br />
-	-->
-		with ng-repeat without default, nor model defined {{foobarbaz}}
+	
+		with ng-repeat. No default, no model defined {{foobarbaz}}. Default should be the first item.
 		<br />
 		<dropdown name="foobarbaz" ng-model="foobarbaz">
 			<ddli value="{{fish.id}}" ng-repeat="fish in fishes">{{fish.name}}</ddli>
