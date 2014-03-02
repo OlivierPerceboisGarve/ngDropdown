@@ -27,13 +27,15 @@
 		<br />
 		
 		<br />dropdown static with default attr without value {{fu}}<br />
-		<dropdown name="fu" ng-model="fu">
+		<dropdown name="lalere" ng-model="lalere">
 			<ddli value="1"><span class='bla'>hu</span><span class='bli'>da</span></ddli>
 			<ddli value="2">ding</ddli>
 			<ddli value="3" default>dong</ddli>
 			<ddli value="4">lala</ddli>
 		</dropdown>
 		<br />
+<!--
+
 		with ng-repeat with attribute "default"  {{foobar}} model not defined
 		<br />
 		<dropdown name="foobar" ng-model="foobar">
@@ -42,12 +44,13 @@
 			</ddli>
 		</dropdown>
 		<br />
-<!--	-->
+	
 		with ng-repeat. No default, no model defined {{foobarbaz}}. Default should be the first item.
 		<br />
 		<dropdown name="foobarbaz" ng-model="foobarbaz">
 			<ddli value="{{fish.id}}" ng-repeat="fish in fishes">{{fish.name}}</ddli>
 		</dropdown>
+-->		
 		<br /><br /><br /><br /><br /><br />
 	</body>
 
