@@ -25,7 +25,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 	var DDO = {
 		restrict: 'E',
 		require: '?ngModel',
-		template: function(that, el){//TODO rename vars
+		template: function(scope, el){//TODO rename vars
 			return	'<div ng-click="dropdown.show = !dropdown.show;" tabindex="0" ng-class="{open: dropdown.show, closed: !dropdown.show}" ui-keypress="{\'shift-tab\': \'tab();\', \'tab\': \'tab();\', \'up\': \'up();\', \'down\': \'down($event);\'}">'
 						+'<input type="hidden" name="'+el.name+'"  />'//ng-model="dropdown.value"
 						+'<span ng-bind-html="dropdown.selection" class="selection"></span>'
@@ -33,27 +33,17 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 					+'</div>';
 		},
 		transclude: true,
-		scope: true,// {model: '=ngModel'},
-		//priority: 100,
-		//replace: true,
+		scope: true,
 		controller: ['$scope', '$element', '$timeout',
 			function( $scope,   $element,   $timeout) {
 			$scope.dropdown = {
 				value : false,
 				show : false,
-				firstOptionSelected : false
-				
+				firstOptionSelected : false				
 			};
-
-			//console.log('DD li len', $element.find('div').find('li').length);
-			//console.log('DD ddli len', $element.find('div').find('ddli').length);
-			var temp = $element.attr('name');
-
-			console.log('temp', temp);
 
 			var options = this.options = [];
 
-			ctrl = this;			
 			$element.find('div')[0].onblur = function(){
 				console.log('DD blur div', this.hasFocus, document.activeElement);//, arguments);
 				$scope.hasFocus();
@@ -66,74 +56,53 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			}
 
 			$scope.hasFocus = function(){
-				opts = options;//this.options;
-				var show = $scope.dropdown.show;
-				console.info('B4 hasFocus $scope.dropdown.show before timeout', temp, $scope.dropdown.show, $scope);
 				$timeout(function(){
 					var hasFocus = false;
-					//console.log('document.activeElement : ', document.activeElement);
-					opts.forEach(function(el){
-						//console.log('options elems :', el);
+					options.forEach(function(el){
 						if (el === document.activeElement){
-							console.info('opt WINNER');
 							hasFocus = true;
 						}
 					});
 					if (!hasFocus){
-						//console.log('has foc DD', $element[0]);
-						if ($element[0] === document.activeElement){
+						/*if ($element[0] === document.activeElement){
+							console.error('bouououou');
 							hasFocus = true;
-							console.warn('DD WINNER');//never called
-						}
-						//console.log('has foc DD div', $element.find('div')[0]);
+						}*/
 						if ($element.find('div')[0] === document.activeElement){
 							hasFocus = true;
-							console.warn('div WINNER');
 						}
-						//if ($element) 
 					}
 					if (!hasFocus){
-						//console.log('close it', hasFocus);
-						console.warn('IN hasFocus $scope.dropdown.show in timeout', temp, $scope.dropdown.show, 'show : ', show, $scope);
-						//$scope.dropdown.show = false;
 						$scope.hide();
 					}
 				}, 0);
 
 			}
-			//this.reset
+
 			$scope.hide = function(){
-				console.log('hide DD', $scope.dropdown);
 				$scope.dropdown.show = false;
 			}
 			
 
 			this.addOption = function (option) {
-				console.warn('addOption this', this);
 				var rank = this.options.push(option[0]);
-				console.log('rank', rank);
 				return rank;
 			};
 
 			$scope.getOptionByValueAttr = this.getOptionByValueAttr = function(valueAttr){
-				console.warn('getOptionByValueAttr this', this, valueAttr);
 				var out;
 				options.forEach(function(opt){
-					console.log('====>', parseInt(opt.value, 10), valueAttr);
 					if (parseInt(opt.value, 10) === valueAttr){
-						console.log('FOUND DEFAULT', opt);
 						out = opt;
-					}
-					console.log('out', out);
-					
+					}					
 				});
 				return out;
 			}
 
 
-			this.preselect = function preselect(el, isDefault) {
+			this.preselect = function preselect(el) {
 				console.warn('preselect', el, $scope.firstOptionSelected);
-				if (!$scope.firstOptionSelected || isDefault){
+				if (!$scope.firstOptionSelected){
 					$scope.firstOptionSelected = true;
 					this.select(el);
 				}
@@ -149,10 +118,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				}, 0);
 			};
 
-			//$scope.select = this.select;
-
 			$scope.tab = $scope.up = function(){
-				console.log('DD tab');
 				$scope.dropdown.show = false;
 			};
 
@@ -182,17 +148,17 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			//console.info('DD compile ', foo, foo.controller('ngModel'));
 
 			return { post: function($scope, el, attr, ctrl) {
-				console.info('DD LINK  el.controller("ngModel")', el, el.find('div'), el.find('div').find('ddli').length, el.controller('ngModel'), '- ctrl.$viewValue :', ctrl.$viewValue); //ngModel, $scope.dropdown.value
+				//console.info('DD LINK  el.controller("ngModel")', el, el.find('div'), el.find('div').find('ddli').length, el.controller('ngModel'), '- ctrl.$viewValue :', ctrl.$viewValue); //ngModel, $scope.dropdown.value
 				$scope.$watch('ctrl.$viewValue',function (newVal, oldVal) {	
 					if (angular.isUndefined(oldVal) && !isNaN(ctrl.$viewValue) ){
-						console.log('DD LINK set default from MODEL. ctrl.$viewValue', ctrl.$viewValue);
+						//console.log('DD LINK set default from MODEL. ctrl.$viewValue', ctrl.$viewValue);
 						var el = $scope.getOptionByValueAttr(ctrl.$viewValue);
 						$scope.select(angular.element(el));
 
 					}
 				});
 				$scope.$watch('$scope.dropdown.value',function (newVal, oldVal) {	
-					console.info('=====> DD LINK watch on $scope.dropdown.value $setViewValue newVal', newVal, oldVal);
+					//console.info('=====> DD LINK watch on $scope.dropdown.value $setViewValue newVal', newVal, oldVal);
 					if (angular.isDefined(oldVal)){
 						//ctrl.$setViewValue(newVal);
 					}
@@ -209,9 +175,9 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		require: '^dropdown',
 		template: 	'<li class="option" tabindex="0" ng-click="selectEl()"'
 						+' ui-keypress="{'
-							+"'shift-tab':	'tab1();', "
+							//+"'shift-tab':	'tab1();', "
 							+"'enter':		'selectEl();', "
-							+"'tab':		'tab1();', "
+							//+"'tab':		'tab1();', "
 							+"'up':			'up($event);', "
 							+"'down':		'down($event);'"
 						+'}" >'
@@ -220,15 +186,9 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		replace: true,
 		scope: true,
 		compile: function(el, attrs){
-			//console.log('ddli compile', el);
 			return {post: function(scope, el, attrs, dropdownCtrl,  $transclude) {
-				//
-				console.log('ddli link',el, scope, scope.$parent);
 
-				//var i = 0;
 				$transclude(scope, function(nodes) {
-					//i++;
-					//console.log('nodes', nodes, i);
 					el.append(nodes);
 				}); 
 
@@ -253,22 +213,22 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			    }
 			    function render(value) {
 			    	el.text(value.text);
-			    	console.log('ddli render', scope.rank, dropdownCtrl, angular.isDefined(value.default));
+			    	//console.log('ddli render', scope.rank, dropdownCtrl, angular.isDefined(value.default));
 			    	dropdownCtrl.preselect(el);
 			    	if (angular.isDefined(value.default) && value.default !== 'false'){
 			    		//console.log('ddli preselect');
-			    		dropdownCtrl.preselect(el, true);
+			    		dropdownCtrl.select(el);
 			    	}			    	
 			    }
 								
 				scope.rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
-				console.log('ddli rank', scope.rank);
+				//console.log('ddli rank', scope.rank);
 				if (scope.rank === 1){
 					//dropdownCtrl.select($compile(el, true));
 				}
 
 				el[0].onblur = function(){
-					console.log('ddli blur', scope);//, dropdownCtrl, document.activeElement, arguments);
+					//console.log('ddli blur', scope);//, dropdownCtrl, document.activeElement, arguments);
 					dropdownCtrl.hasFocus();
 				}
 
@@ -283,9 +243,9 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 					dropdownCtrl.select(el);
 				};
 
-				scope.tab1 = function(){
-					console.log('dropdownCtrl', dropdownCtrl);
-				}
+				//scope.tab1 = function(){
+				//	console.log('dropdownCtrl', dropdownCtrl);
+				//}
 
 
 				scope.up = function($event){
