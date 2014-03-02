@@ -111,12 +111,12 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				return rank;
 			};
 
-			$scope.getOptionById = this.getOptionById = function(id){
-				console.warn('getOptionById this', this);
+			$scope.getOptionByValueAttr = this.getOptionByValueAttr = function(valueAttr){
+				console.warn('getOptionByValueAttr this', this, valueAttr);
 				var out;
 				options.forEach(function(opt){
-					console.log('====>', parseInt(opt.value, 10), id);
-					if (parseInt(opt.value, 10) === id){
+					console.log('====>', parseInt(opt.value, 10), valueAttr);
+					if (parseInt(opt.value, 10) === valueAttr){
 						console.log('FOUND DEFAULT', opt);
 						out = opt;
 					}
@@ -127,7 +127,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			}
 
 
-			this.preselect = function select(el, isDefault) {
+			this.preselect = function preselect(el, isDefault) {
+				console.warn('preselect', el, $scope.firstOptionSelected);
 				if (!$scope.firstOptionSelected || isDefault){
 					$scope.firstOptionSelected = true;
 					this.select(el);
@@ -135,7 +136,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			};
 
 			$scope.select = this.select = function select(el) {
-				//console.log('select', el);
+				console.log('select', el);
 				$scope.dropdown.selection = $sce.trustAsHtml(el.html());
 				$scope.dropdown.value = el.attr('value');
 				$timeout(function(){
@@ -181,15 +182,15 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				$scope.$watch('ctrl.$viewValue',function (newVal, oldVal) {	
 					if (angular.isUndefined(oldVal) && !isNaN(ctrl.$viewValue) ){
 						console.log('DD LINK set default from MODEL. ctrl.$viewValue', ctrl.$viewValue);
-						var el = $scope.getOptionById(ctrl.$viewValue);
+						var el = $scope.getOptionByValueAttr(ctrl.$viewValue);
 						$scope.select(angular.element(el));
 
 					}
 				});
 				$scope.$watch('$scope.dropdown.value',function (newVal, oldVal) {	
-					console.log('DD LINK watch on $scope.dropdown.value $setViewValue newVal', newVal, oldVal);
+					console.info('=====> DD LINK watch on $scope.dropdown.value $setViewValue newVal', newVal, oldVal);
 					if (angular.isDefined(oldVal)){
-						ctrl.$setViewValue(newVal);
+						//ctrl.$setViewValue(newVal);
 					}
 				});}
 			}
@@ -197,8 +198,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 	};
 	return DDO;
 }])
-.directive('ddli',[ '$interpolate', '$timeout', 
-		function(    $interpolate,   $timeout) {
+.directive('ddli',[ '$interpolate', '$compile', '$timeout', 
+		function(    $interpolate,   $compile,   $timeout) {
 	var DDO = {
 		restrict: 'E',
 		require: '^dropdown',
@@ -248,7 +249,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			    }
 			    function render(value) {
 			    	el.text(value.text);
-			    	//console.log('ddli render', dropdownCtrl, angular.isDefined(value.default));
+			    	console.log('ddli render', scope.rank, dropdownCtrl, angular.isDefined(value.default));
+			    	dropdownCtrl.preselect(el);
 			    	if (angular.isDefined(value.default) && value.default !== 'false'){
 			    		//console.log('ddli preselect');
 			    		dropdownCtrl.preselect(el, true);
@@ -258,7 +260,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				scope.rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
 				console.log('ddli rank', scope.rank);
 				if (scope.rank === 1){
-					dropdownCtrl.select(el);
+					//dropdownCtrl.select($compile(el, true));
 				}
 
 				el[0].onblur = function(){
