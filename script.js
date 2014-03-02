@@ -27,7 +27,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		require: '?ngModel',
 		template: function(that, el){//TODO rename vars
 			return	'<div ng-click="dropdown.show = !dropdown.show;" tabindex="0" ng-class="{open: dropdown.show, closed: !dropdown.show}" ui-keypress="{\'shift-tab\': \'tab();\', \'tab\': \'tab();\', \'up\': \'up();\', \'down\': \'down($event);\'}">'
-						+'<input type="hiddenn" name="'+el.name+'"  />'//ng-model="dropdown.value"
+						+'<input type="hidden" name="'+el.name+'"  />'//ng-model="dropdown.value"
 						+'<span ng-bind-html="dropdown.selection" class="selection"></span>'
 						+'<ul ng-show="dropdown.show" class="wrap" ng-transclude></ul>'
 					+'</div>';
@@ -60,6 +60,10 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			}
 
 			console.info('$scope ', $scope);
+
+			this.hasFocus = function(){
+				$scope.hasFocus();
+			}
 
 			$scope.hasFocus = function(){
 				opts = options;//this.options;
