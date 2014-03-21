@@ -49,7 +49,8 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				show : false,
 				firstOptionSelected : false				
 			};
-
+			console.info('document.activeElement : ', document.activeElement);
+			this.originalFocus = $scope.originalFocus = document.activeElement;
 			var options = this.options = [];
 
 			$element.find('div')[0].onblur = function(){
@@ -101,16 +102,18 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			this.preselect = function preselect(el) {
 				if (!$scope.firstOptionSelected){
 					$scope.firstOptionSelected = true;
-					this.select(el);
+					this.select(el, 'nofocus');
 				}
 			};
 
-			$scope.select = this.select = function select(el) {
+			$scope.select = this.select = function select(el, nofocus) {
 				$scope.dropdown.selection = $sce.trustAsHtml(el.html());
 				$scope.dropdown.value = el.attr('value');
 				$timeout(function(){
 					$scope.dropdown.show = false;
-					$element.find('div')[0].focus();
+					if(angular.isUndefined(nofocus)){
+						$element.find('div')[0].focus();	
+					}
 				}, 0);
 			};
 
@@ -139,11 +142,16 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 
 		compile: function compile(el, attr){
 			return { post: function($scope, el, attr, ctrl) {
+				console.warn('originalFocus : ', $scope.originalFocus, 'current : ', document.activeElement);
+
+
 			$scope.$watch('ctrl.$viewValue',function (newVal, oldVal) {	
+					console.warn('WATCH originalFocus : ', $scope.originalFocus, 'current : ', document.activeElement);
+					
 					if (angular.isUndefined(oldVal) && !isNaN(ctrl.$viewValue) ){
 						var el = $scope.getOptionByValueAttr(ctrl.$viewValue);
 						if (el){
-							$scope.select(angular.element(el));	
+							$scope.select(angular.element(el), 'nofocus');	
 						}
 					}
 				});
@@ -203,7 +211,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			    	el.text(value.text);
 			    	dropdownCtrl.preselect(el);
 			    	if (angular.isDefined(value.default) && value.default !== 'false'){
-			    		dropdownCtrl.select(el);
+			    		dropdownCtrl.select(el, 'nofocus');
 			    	}			    	
 			    }
 

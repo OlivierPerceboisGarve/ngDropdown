@@ -11,7 +11,7 @@
 	<script src="script.js"></script> 
 </head>
 	<body ng-controller="food">
-		<input type="text">
+		<input type="text" tabindex="0">
 
 		<br />dropdown static {{foo}}<br />
 		<dropdown name="foo" ng-model="foo">
@@ -23,7 +23,6 @@
 			<ddli value="3">foo</ddli>
 			<ddli value="4">bar</ddli>
 		</dropdown>
-		<br />
 		<br />
 		
 		<br />dropdown static with default attr without value {{fu}}<br />
