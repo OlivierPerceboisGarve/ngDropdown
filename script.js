@@ -1,5 +1,4 @@
 (function() {
-console.log('angular : ', angular);
 angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngMockE2E'])
 .run(function($httpBackend) {
   $httpBackend.whenGET('api/vegies').respond(
@@ -49,7 +48,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				show : false,
 				firstOptionSelected : false				
 			};
-			console.info('document.activeElement : ', document.activeElement);
+
 			this.originalFocus = $scope.originalFocus = document.activeElement;
 			var options = this.options = [];
 
@@ -142,25 +141,20 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 
 		compile: function compile(el, attr){
 			return { post: function($scope, el, attr, ctrl) {
-				console.warn('originalFocus : ', $scope.originalFocus, 'current : ', document.activeElement);
-
-
-			$scope.$watch('ctrl.$viewValue',function (newVal, oldVal) {	
-					console.warn('WATCH originalFocus : ', $scope.originalFocus, 'current : ', document.activeElement);
-					
-					if (angular.isUndefined(oldVal) && !isNaN(ctrl.$viewValue) ){
-						var el = $scope.getOptionByValueAttr(ctrl.$viewValue);
-						if (el){
-							$scope.select(angular.element(el), 'nofocus');	
+				$scope.$watch('ctrl.$viewValue',function (newVal, oldVal) {	
+						if (angular.isUndefined(oldVal) && !isNaN(ctrl.$viewValue) ){
+							var el = $scope.getOptionByValueAttr(ctrl.$viewValue);
+							if (el){
+								$scope.select(angular.element(el), 'nofocus');	
+							}
 						}
-					}
-				});
-				$scope.$watch('dropdown.value',function (newVal, oldVal) {	
-					console.log(newVal, oldVal);
-					if (newVal){
-						ctrl.$setViewValue(newVal);
-					}
-				});}
+					});
+					$scope.$watch('dropdown.value',function (newVal, oldVal) {	
+						if (newVal){
+							ctrl.$setViewValue(newVal);
+						}
+					});
+				}
 			}
 		}
 	};
