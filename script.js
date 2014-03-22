@@ -43,109 +43,138 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		scope: true,
 		controller: ['$scope', '$element', '$timeout',
 			function( $scope,   $element,   $timeout) {
-			$scope.dropdown = {
-				value : false,
-				show : false,
-				firstOptionSelected : false				
-			};
+				$scope.dropdown = {
+					value : false,
+					show : false,
+					firstOptionSelected : false				
+				};
 
-			this.originalFocus = $scope.originalFocus = document.activeElement;
-			var options = this.options = [];
+				this.originalFocus = $scope.originalFocus = document.activeElement;
+				var options = this.options = [];
+				this.selectedRank = false;
 
-			$element.find('div')[0].onblur = function(){
-				$scope.hasFocus();
-			}
-
-			this.hasFocus = function(){
-				$scope.hasFocus();
-			}
-
-			$scope.hasFocus = function(){
-				$timeout(function(){
-					var hasFocus = false;
-					options.forEach(function(el){
-						if (el === document.activeElement){
-							hasFocus = true;
-						}
-					});
-					if (!hasFocus){
-						if ($element.find('div')[0] === document.activeElement){
-							hasFocus = true;
-						}
-					}
-					if (!hasFocus){
-						$scope.hide();
-					}
-				}, 0);
-			}
-
-			$scope.hide = function(){
-				$scope.dropdown.show = false;
-			}
-			
-			this.addOption = function (option) {
-				var rank = this.options.push(option[0]);
-				return rank;
-			};
-
-			$scope.getOptionByValueAttr = function(valueAttr){
-				var out = false;
-				options.forEach(function(opt){
-					if (parseInt(opt.value, 10) === valueAttr){
-						out = opt;
-					}					
-				});
-				return out;
-			}
-
-			this.preselect = function preselect(el) {
-				if (!$scope.firstOptionSelected){
-					$scope.firstOptionSelected = true;
-					this.select(el, 'nofocus');
+				$element.find('div')[0].onblur = function(){
+					$scope.hasFocus();
 				}
-			};
 
-			$scope.select = this.select = function select(el, nofocus) {
-				$scope.dropdown.selection = $sce.trustAsHtml(el.html());
-				$scope.dropdown.value = el.attr('value');
-				$timeout(function(){
+				this.hasFocus = function(){
+					$scope.hasFocus();
+				}
+
+				$scope.hasFocus = function(){
+					$timeout(function(){
+						var hasFocus = false;
+						options.forEach(function(el){
+							if (el === document.activeElement){
+								hasFocus = true;
+							}
+						});
+						if (!hasFocus){
+							if ($element.find('div')[0] === document.activeElement){
+								hasFocus = true;
+							}
+						}
+						if (!hasFocus){
+							$scope.hide();
+						}
+					}, 0);
+				}
+
+				$scope.hide = function(){
 					$scope.dropdown.show = false;
-					if(angular.isUndefined(nofocus)){
-						$element.find('div')[0].focus();	
-					}
-				}, 0);
-			};
+				}
+				
+				this.addOption = function (option) {
+					var rank = this.options.push(option[0]);
+					return rank;
+				};
 
-			$scope.tab = $scope.up = function(){
-				$scope.dropdown.show = false;
-			};
+				$scope.getOptionByValueAttr = function(valueAttr){
+					var el = false, rank = false;
+					options.forEach(function(opt, i){
+						if (parseInt(opt.value, 10) === valueAttr){
+							el = opt;
+							rank = i+1;
+						}					
+					});
+					return {el: el,rank: rank};
+				}
 
-			$scope.down = function($event){
-				$event.preventDefault();
-				$event.stopPropagation();
-				$scope.dropdown.show = true;
-				$timeout(function(){
-					//equivalent to jQuery('li.option')[0].focus(); //yep, verbose.
-					var lis = $element.find('li');
-					var focused = false;
-					for (var i = 0, len = lis.length; i < len; i++){
-						if (angular.element(lis[0]).hasClass('option')){
-							lis[0].focus();
-							focused = true;
-						}	
+				this.preselect = function preselect(el, rank) {
+					if (!$scope.firstOptionSelected){
+						$scope.firstOptionSelected = true;
+						this.select(el, rank, 'nofocus');
 					}
-				},
-				0);
-			};
-		}],
+				};
+
+				$scope.setSelectedRank = function(rank){
+					this.selectedRank = rank;
+				}
+
+				$scope.select = this.select = function select(el, rank, nofocus) {
+					console.info('select rank : ', rank, 'el: ',el);
+					$scope.setSelectedRank(rank);
+					$scope.dropdown.selection = $sce.trustAsHtml(el.html());
+					$scope.dropdown.value = el.attr('value');
+					$timeout(function(){
+						if ($scope.dropdown.show  !== false){
+							$scope.dropdown.show = false;	
+						}
+						
+						if(angular.isUndefined(nofocus) || (nofocus === false)){
+							$element.find('div')[0].focus();	
+						}
+					}, 0);
+				};
+
+				$scope.tab = $scope.up = function(){
+					$scope.dropdown.show = false;
+				};
+
+				$scope.down = function($event){
+					$event.preventDefault();
+					$event.stopPropagation();
+						if ($scope.dropdown.show  !== false){
+							$scope.dropdown.show = false;	
+						}
+					var select = this.select;
+					var selectedRank = this.selectedRank;
+					$timeout(function(){
+						//equivalent to jQuery('li.option')[0].focus(); //yep, verbose.
+						var lis = $element.find('li');
+						console.log('lis', lis, lis.length, 'this.selectedRank', selectedRank);
+						var rankToSelect = selectedRank+1;
+						if (selectedRank === lis.length){
+							rankToSelect = 1;
+						}
+
+						select(lis.eq(rankToSelect-1), rankToSelect);
+						/*
+
+						//opens the dropout with tab browsing. Not native behavior, so should be made optional.
+
+						var focused = false;
+						for (var i = 0, len = lis.length; i < len; i++){
+							if (angular.element(lis[0]).hasClass('option')){
+								lis[0].focus();
+								focused = true;
+							}	
+						}*/
+					},
+					0);
+				};
+			}
+		],
 
 		compile: function compile(el, attr){
 			return { post: function($scope, el, attr, ctrl) {
 				$scope.$watch('ctrl.$viewValue',function (newVal, oldVal) {	
 						if (angular.isUndefined(oldVal) && !isNaN(ctrl.$viewValue) ){
-							var el = $scope.getOptionByValueAttr(ctrl.$viewValue);
+							var opt = $scope.getOptionByValueAttr(ctrl.$viewValue);
+							var el = opt.el, rank = opt.rank;
 							if (el){
-								$scope.select(angular.element(el), 'nofocus');	
+								console.warn('rank', rank);
+								$scope.select(angular.element(el), rank, 'nofocus');	
 							}
 						}
 					});
@@ -176,11 +205,14 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 		replace: true,
 		scope: true,
 		compile: function(el, attrs){
-			return {post: function(scope, el, attrs, dropdownCtrl,  $transclude) {
+			return {post: function(scope, el, attrs, dropdownCtrl, $transclude) {
 
 				$transclude(scope, function(nodes) {
 					el.append(nodes);
 				}); 
+
+				scope.rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
+
 
 				var interpolateTextFn = $interpolate(el.text(), true);
 				var interpolateDefaultFn = $interpolate(attrs, true);
@@ -203,13 +235,14 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 			    }
 			    function render(value) {
 			    	el.text(value.text);
-			    	dropdownCtrl.preselect(el);
+			    	console.log('render : ', scope.rank, 'val', value);
+			    	dropdownCtrl.preselect(el, scope.rank);
 			    	if (angular.isDefined(value.default) && value.default !== 'false'){
-			    		dropdownCtrl.select(el, 'nofocus');
+			    		console.info('render attribute');
+			    		dropdownCtrl.select(el, scope.rank, 'nofocus');
 			    	}			    	
 			    }
 
-			    scope.rank = dropdownCtrl.addOption(el);//let the dropdown controller know about this option element and receive an iterator back
 								
 				el[0].onblur = function(){
 					dropdownCtrl.hasFocus();
@@ -223,7 +256,7 @@ angular.module('testdirective', ['ngResource', 'ngSanitize', 'ui.keypress', 'ngM
 				}
 	      
 				scope.selectEl = function() {
-					dropdownCtrl.select(el);
+					dropdownCtrl.select(el, scope.rank);
 				};
 
 				scope.up = function($event){
