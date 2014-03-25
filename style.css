@@ -5,7 +5,15 @@ span{
 li{
   border: 1px solid orange;
   }
-li:hover,
+
 li:focus {
   background-color: #f00;
+}
+
+dropdown>div>ul{
+	position: absolute;
+	list-style-type: none;
+	background-color: Window;
+	padding: 0;
+	margin-top: 0;
 }
